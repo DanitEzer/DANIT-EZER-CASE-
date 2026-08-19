@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תיק תביעה – דנית עזר</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Assistant:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2a33;
+    --ink-soft:#33454f;
+    --paper:#f3efe4;
+    --paper-raised:#fbf9f2;
+    --paper-line:#d9d0b9;
+    --rust:#a8461f;
+    --rust-soft:#c96a3e;
+    --teal:#3c5e56;
+    --teal-soft:#5c8378;
+    --tag-bg:#e7e0cb;
+    --text:#221d16;
+    --text-dim:#5b5346;
+    --shadow: 0 1px 2px rgba(28,20,10,.08), 0 8px 24px -12px rgba(28,20,10,.25);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #fffdf6 0%, transparent 60%),
+      var(--paper);
+    color:var(--text);
+    font-family:'Assistant', sans-serif;
+    line-height:1.55;
+  }
+
+  ::selection{background:var(--rust-soft); color:#fff;}
+
+  a{color:inherit;}
+
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  /* ===== Header / case tab ===== */
+  .case-tab{
+    position:relative;
+    background:var(--ink);
+    color:#f3efe4;
+    padding:56px 24px 84px;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .case-tab::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0px, rgba(255,255,255,.035) 1px, transparent 1px, transparent 34px);
+    z-index:-1;
+  }
+  .case-tab::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:26px;
+    background:var(--paper);
+    clip-path: polygon(0 100%, 2% 40%, 4% 100%, 6% 45%, 8% 100%, 10% 42%, 12% 100%, 14% 44%, 16% 100%, 18% 40%, 20% 100%, 22% 46%, 24% 100%, 26% 42%, 28% 100%, 30% 44%, 32% 100%, 34% 40%, 36% 100%, 38% 46%, 40% 100%, 42% 42%, 44% 100%, 46% 44%, 48% 100%, 50% 40%, 52% 100%, 54% 46%, 56% 100%, 58% 42%, 60% 100%, 62% 44%, 64% 100%, 66% 40%, 68% 100%, 70% 46%, 72% 100%, 74% 42%, 76% 100%, 78% 44%, 80% 100%, 82% 40%, 84% 100%, 86% 46%, 88% 100%, 90% 42%, 92% 100%, 94% 44%, 96% 100%, 98% 40%, 100% 100%);
+  }
+  .case-tab-inner{
+    max-width:980px; margin:0 auto; position:relative; z-index:1;
+  }
+  .eyebrow{
+    display:flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px; letter-spacing:.14em;
+    color:#c9a870; text-transform:uppercase;
+    margin-bottom:22px;
+  }
+  .eyebrow::before{
+    content:""; width:8px; height:8px; border-radius:50%;
+    background:var(--rust-soft); box-shadow:0 0 0 3px rgba(201,106,62,.25);
+  }
+  h1.case-name{
+    font-family:'Frank Ruhl Libre', serif;
+    font-weight:900;
+    font-size:clamp(34px, 6vw, 58px);
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .case-sub{
+    font-size:17px; color:#cfc6ae; max-width:640px; margin-bottom:34px;
+  }
+
+  .stat-strip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:14px;
+    overflow:hidden;
+    background:rgba(255,255,255,.03);
+  }
+  .stat{
+    padding:16px 18px;
+    border-inline-start:1px solid rgba(255,255,255,.12);
+  }
+  .stat:first-child{border-inline-start:none;}
+  .stat-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+    color:#a99a78; margin-bottom:6px;
+  }
+  .stat-value{font-size:15.5px; font-weight:600; color:#f3efe4;}
+  .stat-value.rust{color:#e08a5f;}
+
+  @media (max-width:720px){
+    .stat-strip{grid-template-columns:1fr 1fr;}
+    .stat:nth-child(3){border-inline-start:none;}
+  }
+
+  /* ===== Main content ===== */
+  main{max-width:980px; margin:0 auto; padding:10px 24px 100px;}
+
+  .section-head{
+    display:flex; align-items:baseline; gap:14px;
+    margin:70px 0 30px;
+  }
+  .section-head .num{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--rust); font-size:14px; font-weight:600;
+  }
+  .section-head h2{
+    font-family:'Frank Ruhl Libre', serif;
+    font-size:28px; font-weight:700; margin:0;
+  }
+  .section-head .rule{flex:1; height:1px; background:var(--paper-line);}
+  .section-intro{
+    color:var(--text-dim); font-size:15.5px; max-width:640px; margin:-16px 0 32px;
+  }
+
+  /* ===== Timeline ===== */
+  .timeline{position:relative;}
+  .timeline::before{
+    content:"";
+    position:absolute; top:6px; bottom:6px;
+    inset-inline-start:23px;
+    width:2px;
+    background:repeating-linear-gradient(to bottom, var(--rust-soft) 0 6px, transparent 6px 12px);
+  }
+  .event{
+    position:relative;
+    padding-inline-start:60px;
+    margin-bottom:38px;
+  }
+  .event-node{
+    position:absolute; inset-inline-start:12px; top:4px;
+    width:24px; height:24px; border-radius:50%;
+    background:var(--paper-raised);
+    border:2px solid var(--rust);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px;
+    z-index:2;
+  }
+  .event-card{
+    background:var(--paper-raised);
+    border:1px solid var(--paper-line);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+  }
+  .event-meta{
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    margin-bottom:8px;
+  }
+  .event-date{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px; font-weight:600;
+    color:var(--rust);
+    background:rgba(168,70,31,.08);
+    padding:3px 9px; border-radius:6px;
+  }
+  .event-index{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px; color:var(--text-dim);
+  }
+  .event-title{
+    font-family:'Frank Ruhl Libre', serif;
+    font-size:20px; font-weight:700; margin:2px 0 8px;
+  }
+  .event-text{font-size:15px; color:var(--ink-soft);}
+  .event-text b{color:var(--text); font-weight:700;}
+
+  .doc-row{
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;
+  }
+  .doc-chip{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:13px; font-weight:600;
+    color:var(--teal);
+    background:#eef0e9;
+    border:1px solid #d7ddc9;
+    padding:6px 12px; border-radius:20px;
+    text-decoration:none;
+    transition:transform .12s ease, background .12s ease;
+  }
+  .doc-chip:hover{background:#e2e8d6; transform:translateY(-1px);}
+  .doc-chip.img-chip{color:var(--rust); background:var(--tag-bg); border-color:#d8c9a3;}
+  .doc-chip.img-chip:hover{background:#ecddb8;}
+
+  .note{
+    font-size:13px; color:var(--text-dim); margin-top:12px;
+    padding-inline-start:10px; border-inline-start:2px solid var(--paper-line);
+  }
+
+  /* ===== Photo gallery ===== */
+  .gallery{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px;
+  }
+  .gallery a{display:block; border-radius:10px; overflow:hidden; border:1px solid var(--paper-line); box-shadow:var(--shadow);}
+  .gallery img{width:100%; height:150px; object-fit:cover; display:block; transition:transform .25s ease;}
+  .gallery a:hover img{transform:scale(1.06);}
+  @media (max-width:640px){.gallery{grid-template-columns:repeat(2,1fr);}}
+
+  /* ===== Appendix / credentials ===== */
+  .appendix{
+    background:var(--paper-raised);
+    border:1px dashed var(--paper-line);
+    border-radius:14px;
+    padding:24px 26px;
+  }
+  .appendix h3{font-family:'Frank Ruhl Libre', serif; font-size:18px; margin:0 0 6px;}
+  .appendix p{font-size:14px; color:var(--text-dim); margin:0 0 16px;}
+  .cred-list{display:flex; flex-wrap:wrap; gap:10px;}
+
+  footer{
+    max-width:980px; margin:0 auto; padding:20px 24px 60px;
+    color:var(--text-dim); font-size:13px; text-align:center;
+  }
+
+  /* ===== Lightbox ===== */
+  .lightbox{
+    position:fixed; inset:0; background:rgba(15,12,8,.88);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:30px;
+  }
+  .lightbox.open{display:flex;}
+  .lightbox img{max-width:100%; max-height:100%; border-radius:6px; box-shadow:0 20px 60px rgba(0,0,0,.5);}
+  .lightbox-close{
+    position:absolute; top:22px; inset-inline-end:26px;
+    color:#f3efe4; font-size:28px; cursor:pointer; font-family:'JetBrains Mono',monospace;
+  }
+</style>
+</head>
+<body>
+
+<header class="case-tab">
+  <div class="case-tab-inner">
+    <div class="eyebrow">תיק תביעה דיגיטלי · ריכוז ראיות ומסמכים</div>
+    <h1 class="case-name">דנית עזר</h1>
+    <p class="case-sub">ריכוז כרונולוגי של האירוע, המסמכים הרפואיים, ההפניות והראיות הרלוונטיות לתאונת הנפילה מאופניים ולתביעה בגין המפגע התשתיתי.</p>
+
+    <div class="stat-strip">
+      <div class="stat">
+        <div class="stat-label">תאריך האירוע</div>
+        <div class="stat-value rust mono">18.08.2023</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">מיקום</div>
+        <div class="stat-value">פארק שער הסקלור, ת"א</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">סוג האירוע</div>
+        <div class="stat-value">נפילה מאופניים – מפגע תשתיתי</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">סטטוס</div>
+        <div class="stat-value">נכות צמיתה 10% (אורתופדית) · בטיפול נפשי ותרופתי מתמשך</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="section-head">
+    <span class="num">01</span>
+    <h2>ציר זמן ותיעוד</h2>
+    <div class="rule"></div>
+  </div>
+  <p class="section-intro">כל פריט בציר הזמן מבוסס על מסמך רפואי, קבלה או תיעוד מקורי. לחיצה על תג המסמך פותחת את הקובץ המקורי.</p>
+
+  <div class="timeline" id="timeline">
+    <div class="event">
+      <div class="event-node">🚴</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">18.08.2023</span>
+          <span class="event-index">מסמך 01/23</span>
+        </div>
+        <h3 class="event-title">אירוע הנפילה – רכיבה על אופניים</h3>
+        <p class="event-text">רכיבה בנתיב אופניים ייעודי בפארק שער הסקלור, תל אביב, כשבאזור מתבצעות במקביל עבודות תשתית להקמת הדולפינריום החדש. בנתיב האופניים היה <b>מפגע תשתיתי לא מסומן ולא מגודר</b> (בור בכביש), אשר תוקן על ידי העירייה במועד מאוחר יותר. הרכיבה בוצעה עם קסדה. כתוצאה מהמפגע איבדה הרוכבת שליטה ונפלה, עם חבלה בשתי הידיים (בעיקר ביד ימין).</p>
+        <div class="gallery"><a href="assets/hazard_photo_1.jpg" data-lightbox target="_blank"><img src="assets/hazard_photo_1.jpg" alt="תיעוד מפגע 1" loading="lazy"></a>
+<a href="assets/hazard_photo_2.jpg" data-lightbox target="_blank"><img src="assets/hazard_photo_2.jpg" alt="תיעוד מפגע 2" loading="lazy"></a>
+<a href="assets/hazard_photo_3.jpg" data-lightbox target="_blank"><img src="assets/hazard_photo_3.jpg" alt="תיעוד מפגע 3" loading="lazy"></a>
+</div>
+        <div class="doc-row">
+          
+        </div>
+        <div class="note">תמונות המפגע צולמו בביקור חוזר במקום האירוע, לשם תיעוד מצב נתיב האופניים לפני תיקונו על ידי העירייה.</div>
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🩻</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">18.08.2023 · 21:43</span>
+          <span class="event-index">מסמך 02/23</span>
+        </div>
+        <h3 class="event-title">בדיקת רנטגן ראשונית – מכון דימות מכבי</h3>
+        <p class="event-text">בדיקת רנטגן לשתי הידיים בעקבות הפניה ממוקד הרפואה הדחופה. פענוח ד״ר קיריל דרקץ, מומחית ברדיולוגיה אבחנתית: אותרו <b>שברים בראש הרדיוס בשתי הידיים</b>, המצריכים המשך בירור וטיפול.</p>
+        <div class="gallery"><a href="assets/xray_day_of_injury_xray_0.jpg" data-lightbox target="_blank"><img src="assets/xray_day_of_injury_xray_0.jpg" alt="צילום 1" loading="lazy"></a>
+<a href="assets/xray_day_of_injury_xray_1.jpg" data-lightbox target="_blank"><img src="assets/xray_day_of_injury_xray_1.jpg" alt="צילום 2" loading="lazy"></a>
+<a href="assets/xray_day_of_injury_xray_2.jpg" data-lightbox target="_blank"><img src="assets/xray_day_of_injury_xray_2.jpg" alt="צילום 3" loading="lazy"></a>
+<a href="assets/xray_day_of_injury_xray_3.jpg" data-lightbox target="_blank"><img src="assets/xray_day_of_injury_xray_3.jpg" alt="צילום 4" loading="lazy"></a>
+<a href="assets/xray_day_of_injury_xray_4.jpg" data-lightbox target="_blank"><img src="assets/xray_day_of_injury_xray_4.jpg" alt="צילום 5" loading="lazy"></a>
+</div>
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/xray_reading_day1.pdf" target="_blank">📄 פענוח רנטגן ראשוני</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🏥</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">18.08.2023 · 21:45</span>
+          <span class="event-index">מסמך 03/23</span>
+        </div>
+        <h3 class="event-title">בדיקה במוקד רפואה דחופה מכבי</h3>
+        <p class="event-text">בדיקה ע״י ד״ר זייד ריאן ענאן. תלונות: נפילה מאופניים עם קסדה, חבלה בעיקר באמה ימין וגם באמה שמאלית. אבחנה: <b>שבר בראש הרדיוס בשתי הידיים (Bilateral)</b>. הופנתה למיון בית חולים להמשך טיפול אורתופדי.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/er_visit_summary.pdf" target="_blank">📄 סיכום ביקור במוקד</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🏥</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">18.08.2023 22:12 – 19.08.2023 00:19</span>
+          <span class="event-index">מסמך 04/23</span>
+        </div>
+        <h3 class="event-title">קבלה ושחרור ממיון בית החולים וולפסון</h3>
+        <p class="event-text">התקבלה למיון האורתופדי בליווי בן משפחה. אבחנה: <b>שבר סגור בראש הרדיוס בשתי הידיים</b> (Bilateral Fracture of Head of Radius, Closed). ניתן טיפול תרופתי לכאב, אושרה חופשת מחלה ל-7 ימים, והומלץ על המשך מעקב אצל אורתופד בקהילה תוך שבועיים ועל טיפולי פיזיותרפיה.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/er_summary_wolfson.pdf" target="_blank">📄 מכתב שחרור מוולפסון</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🦴</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">20.08.2023</span>
+          <span class="event-index">מסמך 05/23</span>
+        </div>
+        <h3 class="event-title">ביקורת אורתופדית ראשונה והפניה לפיזיותרפיה</h3>
+        <p class="event-text">ד״ר לאו בר און, מומחה לכירורגיה אורתופדית, מכבי פתח תקווה. אבחנה: שבר סגור בראש הרדיוס דו-צדדי. ניתנה הפניה לטיפולי פיזיותרפיה, בתוקף עד 16.02.2024.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/ortho_visit_200823.pdf" target="_blank">📄 סיכום ביקור והפניה</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🦴</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">17.12.2023</span>
+          <span class="event-index">מסמך 06/23</span>
+        </div>
+        <h3 class="event-title">ביקורת אורתופדית חוזרת והפניה לרנטגן</h3>
+        <p class="event-text">המשך מעקב אצל ד״ר לאו בר און. ניתנה הפניה לצילום רנטגן חוזר לשני המרפקים לבדיקת מצב איחוי השבר.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/ortho_followup_171223.pdf" target="_blank">📄 סיכום ביקורת והפניה</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🩻</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">17.12.2023 · 22:59</span>
+          <span class="event-index">מסמך 07/23</span>
+        </div>
+        <h3 class="event-title">פענוח רנטגן חוזר</h3>
+        <p class="event-text">ד״ר דנה זיו, מומחית ברדיולוגיה אבחנתית: <b>מרפק ימין</b> – שבר בראש הרדיוס ללא תזוזה, ללא סימני ארתרוזיס. <b>מרפק שמאל</b> – ללא פגיעה בעצם נראית, מבנה וגבולות עצם תקינים.</p>
+        <div class="gallery"><a href="assets/xray_checkup_xray_0.jpg" data-lightbox target="_blank"><img src="assets/xray_checkup_xray_0.jpg" alt="צילום 1" loading="lazy"></a>
+<a href="assets/xray_checkup_xray_1.jpg" data-lightbox target="_blank"><img src="assets/xray_checkup_xray_1.jpg" alt="צילום 2" loading="lazy"></a>
+<a href="assets/xray_checkup_xray_2.jpg" data-lightbox target="_blank"><img src="assets/xray_checkup_xray_2.jpg" alt="צילום 3" loading="lazy"></a>
+<a href="assets/xray_checkup_xray_3.jpg" data-lightbox target="_blank"><img src="assets/xray_checkup_xray_3.jpg" alt="צילום 4" loading="lazy"></a>
+</div>
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/xray_reading_171223.pdf" target="_blank">📄 פענוח רנטגן</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">💆</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">07.04.2024</span>
+          <span class="event-index">מסמך 08/23</span>
+        </div>
+        <h3 class="event-title">טיפול פיזיותרפיה</h3>
+        <p class="event-text">טיפול פיזיותרפיה אצל יאנה אלכסנדרוביץ' קלר (Janne Keller Physiotherapy) – המשך שיקום תפקודי הידיים.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/physio_receipt_070424.pdf" target="_blank">📄 קבלה על טיפול</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🧠</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">05.08.2024 – 28.10.2024</span>
+          <span class="event-index">מסמך 09/23</span>
+        </div>
+        <h3 class="event-title">טיפול פסיכולוגי – 12 מפגשים</h3>
+        <p class="event-text">מסכת טיפולים פסיכולוגיים אצל דנה קליין-לוגבינסקי, תל אביב. 12 מפגשים לאורך התקופה, בעלות כוללת של 3,444.50 ₪.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/psych_treatment_invoice_2024.pdf" target="_blank">📄 חשבונית ריכוז טיפולים</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🦴</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">25.08.2024</span>
+          <span class="event-index">מסמך 10/23</span>
+        </div>
+        <h3 class="event-title">ביקורת אורתופדית – שנה לאחר האירוע</h3>
+        <p class="event-text">המשך מעקב אצל ד״ר לאו בר און. ניתנה הפניה לרנטגן חוזר לבירור שינויים ניווניים אפשריים כתוצאה מהשבר.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/ortho_followup_250824.pdf" target="_blank">📄 סיכום ביקורת והפניה</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🩻</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">25.08.2024 · 17:30</span>
+          <span class="event-index">מסמך 11/23</span>
+        </div>
+        <h3 class="event-title">רנטגן חוזר – שנה לאחר האירוע</h3>
+        <p class="event-text">הבדיקה בוצעה במכון דימות מכבי; בהתאם למסמך שבתיק, הבדיקה בוצעה ללא פענוח רדיולוג מצורף.</p>
+        <div class="gallery"><a href="assets/xray_checkup_after_year_xray_0.jpg" data-lightbox target="_blank"><img src="assets/xray_checkup_after_year_xray_0.jpg" alt="צילום 1" loading="lazy"></a>
+<a href="assets/xray_checkup_after_year_xray_1.jpg" data-lightbox target="_blank"><img src="assets/xray_checkup_after_year_xray_1.jpg" alt="צילום 2" loading="lazy"></a>
+<a href="assets/xray_checkup_after_year_xray_2.jpg" data-lightbox target="_blank"><img src="assets/xray_checkup_after_year_xray_2.jpg" alt="צילום 3" loading="lazy"></a>
+<a href="assets/xray_checkup_after_year_xray_3.jpg" data-lightbox target="_blank"><img src="assets/xray_checkup_after_year_xray_3.jpg" alt="צילום 4" loading="lazy"></a>
+</div>
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/xray_reading_250824.pdf" target="_blank">📄 תיעוד הבדיקה</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🩺</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">29.10.2024</span>
+          <span class="event-index">מסמך 12/23</span>
+        </div>
+        <h3 class="event-title">הפניה לפיזיותרפיה נוספת</h3>
+        <p class="event-text">ד״ר טוקאן דאוד, רופאת משפחה, מכבי שירותי בריאות. סיבת ההפניה: פיזיותרפיה בעקבות שברים בשתי הידיים לפני כשנה. תוקף ההפניה: 29.10.2024–27.04.2025.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/physio_referral_291024.pdf" target="_blank">📄 הפניה לפיזיותרפיה</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🦷</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">29.10.2024</span>
+          <span class="event-index">מסמך 13/23</span>
+        </div>
+        <h3 class="event-title">הפניה לייעוץ בשל חריקת שיניים על רקע חרדה וכאב</h3>
+        <p class="event-text">הפניה מרופאת המשפחה לייעוץ רפואת שיניים, בעקבות תלונה על חריקת שיניים בלילה על רקע חרדה וכאבים מתמשכים.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/dental_anxiety_referral_291024.pdf" target="_blank">📄 הפניה לייעוץ</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🌿</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">18.11.2024</span>
+          <span class="event-index">מסמך 14/23</span>
+        </div>
+        <h3 class="event-title">טיפול ברפואה סינית / אקופונקטורה</h3>
+        <p class="event-text">טיפול אצל רון בר-נחום, מטפל מוסמך ברפואה סינית ואקופונקטורה, לכאב כללי בעקבות התאונה והשברים בשתי עצמות הרדיוס.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/chinese_medicine_receipt_181124.pdf" target="_blank">📄 קבלה על טיפול</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🩺</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">24.11.2024</span>
+          <span class="event-index">מסמך 15/23</span>
+        </div>
+        <h3 class="event-title">הפניה לרפואה משלימה</h3>
+        <p class="event-text">ד״ר טוקאן דאוד – הפניה להמשך טיפול ברפואה משלימה (רפואה סינית / כוסות רוח), על רקע שבר בראש הרדיוס בשתי הידיים לפני כשנה.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/alt_medicine_referral_241124.pdf" target="_blank">📄 הפניה לרפואה משלימה</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">💆</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">25.11.2024</span>
+          <span class="event-index">מסמך 16/23</span>
+        </div>
+        <h3 class="event-title">טיפול פיזיותרפיה – אסותא</h3>
+        <p class="event-text">אבחון וטיפול פיזיותרפיה במרכזים הרפואיים אסותא, כחלק מהמשך תהליך השיקום.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/physio_receipt_assuta_251124.pdf" target="_blank">📄 קבלה על טיפול</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">💆</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">01.12.2024</span>
+          <span class="event-index">מסמך 17/23</span>
+        </div>
+        <h3 class="event-title">טיפול פיזיותרפיה – אסותא</h3>
+        <p class="event-text">המשך טיפולי פיזיותרפיה אצל סופיה קולודיאז'קי, אסותא.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/physio_receipt_assuta_011224.pdf" target="_blank">📄 קבלה על טיפול</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">💆</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">10.12.2024</span>
+          <span class="event-index">מסמך 18/23</span>
+        </div>
+        <h3 class="event-title">חבילת טיפולי פיזיותרפיה – אסותא</h3>
+        <p class="event-text">רכישת חבילה של 5 טיפולי פיזיותרפיה/קינזיותרפיה אצל סופיה קולודיאז'קי, אסותא, בעלות של 1,600 ₪.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/physio_receipt_assuta_101224.pdf" target="_blank">📄 קבלה על החבילה</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🧠</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">04.05.2025</span>
+          <span class="event-index">מסמך 19/23</span>
+        </div>
+        <h3 class="event-title">ייעוץ פסיכיאטרי</h3>
+        <p class="event-text">ד״ר גבי אייזנברג רומנו, מומחה לפסיכיאטריה, תל אביב. ייעוץ בעקבות סימני חרדה מתמשכים על רקע האירוע וההשלכות התפקודיות שלו.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/psychiatry_consult_040525.pdf" target="_blank">📄 סיכום ייעוץ</a>
+<a class="doc-chip" href="assets/psychiatry_invoice_040525.pdf" target="_blank">📄 קבלה על הייעוץ</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">📝</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">דצמבר 2025</span>
+          <span class="event-index">מסמך 20/23</span>
+        </div>
+        <h3 class="event-title">מכתב מטפלת – פסיכולוגית קלינית</h3>
+        <p class="event-text">מכתב סיכום מד״ר דפנה קליינהנדלר-לוסטיג, פסיכולוגית קלינית, המטפלת בדנית באופן פרטני וקבוע <b>עוד משנת 2021 – טרם האירוע</b>. המכתב מתעד רקע נפשי יציב וחזק לפני התאונה, ומתאר את ההשפעה המשמעותית שחלה בעקבותיה: פגיעה תפקודית כמעט מוחלטת בשבועות הראשונים, תלות מלאה בהוריה, כאבים גופניים מתמשכים, והתפתחות הדרגתית של סימפטומים חרדתיים משמעותיים <b>שלא היו קיימים כלל</b> בטיפול טרם התאונה – שהובילו בסופו של דבר להפניה לטיפול תרופתי בפברואר 2025.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/psych_letter_treating_dec2025.pdf" target="_blank">📄 מכתב הפסיכולוגית המטפלת</a>
+
+        </div>
+        <div class="note">המכתב מהווה עדות רציפה על מצבה הנפשי של דנית לפני ואחרי האירוע, מאותה מטפלת.</div>
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🦴</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">13.02.2026</span>
+          <span class="event-index">מסמך 21/23</span>
+        </div>
+        <h3 class="event-title">בדיקה קלינית לצורך חוות דעת אורתופדית</h3>
+        <p class="event-text">בדיקה קלינית ע״י ד״ר מיכאל לבני, מומחה כירורגיה-אורתופדית, במסגרת חוות דעת רפואית משפטית. ממצאים: הגבלת יישור במרפק ימין (מ-0° עד 10°-), קיימת הגבלה קלה בסופינציה ביד שמאל; הגבלת כיפוף במרפק ימין עד 90°.</p>
+        
+        <div class="doc-row">
+          
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">⚖️</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">05.03.2026</span>
+          <span class="event-index">מסמך 22/23</span>
+        </div>
+        <h3 class="event-title">חוות דעת אורתופדית – הערכת נכות</h3>
+        <p class="event-text">חוות דעת רפואית מטעם ד״ר מיכאל לבני, מומחה כירורגיה-אורתופדית, לעו״ד אבי שינדלר. הערכה: <b>נכות זמנית בשיעור 100%</b> למשך שישה שבועות מיום התאונה, <b>נכות זמנית בשיעור 50%</b> למשך ששה שבועות נוספים, ולאחריה <b>נכות צמיתה בשיעור 10%</b> עקב הגבלה קלה בתנועות מרפק ימין.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/ortho_legal_opinion_050326.pdf" target="_blank">📄 חוות דעת אורתופדית מלאה</a>
+
+        </div>
+        
+      </div>
+    </div>
+
+    <div class="event">
+      <div class="event-node">🧠</div>
+      <div class="event-card">
+        <div class="event-meta">
+          <span class="event-date mono">19.04.2026</span>
+          <span class="event-index">מסמך 23/23</span>
+        </div>
+        <h3 class="event-title">הערכה פסיכיאטרית</h3>
+        <p class="event-text">ד״ר אינה ממרוקוב, מומחית לפסיכיאטריה. אבחנה: <b>הפרעת הסתגלות עם חרדה ותגובה דיכאונית</b> (Adjustment Disorder with Anxiety and Depression Reaction) בעקבות תאונת הדרכים מיום 18.08.2023. תלונות: חרדה מתמדת, הפרעות שינה, ירידה בביטחון עצמי, מחשבות טורדניות לגבי העתיד הבריאותי. המלצה: המשך מעקב פסיכיאטרי סדיר וטיפול תרופתי קבוע – Cipralex 10mg, Clonex 0.5mg – לצד המשך טיפול פסיכולוגי.</p>
+        
+        <div class="doc-row">
+          <a class="doc-chip" href="assets/psychiatric_assessment_190426.pdf" target="_blank">📄 הערכה פסיכיאטרית מלאה</a>
+
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <span class="num">02</span>
+    <h2>נספחים – הסמכות המטפלים</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="appendix">
+    <h3>רישיונות ותעודות מקצועיות</h3>
+    <p>תעודות הסמכה של אנשי המקצוע שהעניקו טיפול במסגרת השיקום, לצורך אימות רקע מקצועי.</p>
+    <div class="cred-list">
+      <a class="doc-chip" href="assets/credential_physio_license_kolodyazky.pdf" target="_blank">📄 רישיון פיזיותרפיה – סופיה קולודיאז'קי</a>
+      <a class="doc-chip" href="assets/credential_physio_license_keller.pdf" target="_blank">📄 רישיון פיזיותרפיה – יאנה אלכסנדרוביץ' קלר</a>
+      <a class="doc-chip img-chip" href="assets/credential_chinesemed_diploma1.jpg" target="_blank">🖼️ דיפלומה ברפואה סינית – רון בר-נחום (1)</a>
+      <a class="doc-chip img-chip" href="assets/credential_chinesemed_diploma2.jpg" target="_blank">🖼️ דיפלומה ברפואה סינית – רון בר-נחום (2)</a>
+      <a class="doc-chip img-chip" href="assets/credential_chinesemed_diploma3.jpg" target="_blank">🖼️ הסמכה ברפואה סינית – רון בר-נחום (3)</a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  האתר מרכז את השתלשלות האירועים והמסמכים העיקריים בתיק באופן כרונולוגי ונגיש לצורך טיפול משפטי.
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" id="lightboxClose">✕ סגור</span>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  document.querySelectorAll('[data-lightbox]').forEach(el=>{
+    el.addEventListener('click', e=>{
+      e.preventDefault();
+      lightboxImg.src = el.getAttribute('href');
+      lightbox.classList.add('open');
+    });
+  });
+  document.getElementById('lightboxClose').addEventListener('click', ()=>lightbox.classList.remove('open'));
+  lightbox.addEventListener('click', e=>{ if(e.target===lightbox) lightbox.classList.remove('open'); });
+</script>
+
+</body>
+</html>
